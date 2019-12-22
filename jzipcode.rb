@@ -11,21 +11,21 @@ class JZipCode
 #2.JZipCode#createがテーブルを作成し、KEN_ALL.CSVのデータをデータベースに登録するメソッド
   def create(zipfile)
 #3.ファイルが存在している場合、何もしない
-#　ファイルが存在しない場合、
-#　SQLite3::Database#openメソッドを使い、新規にデータベースファイルを開き、
-#　SQLのCREATE TABLE分を発行する。
+# ファイルが存在しない場合、
+# SQLite3::Database#openメソッドを使い、新規にデータベースファイルを開き、
+# SQLのCREATE TABLE分を発行する。
     return if File.exist?(@dbfile)
     SQLite3::Database.open(@dbfile) do |db| 
      db.execute(<<-SQL)
         CREATE TABLE IF NOT EXISTS zip_codes
           (code TEXT, pref TEXT, city TEXT, addr TEXT, alladdr TEXT)
       SQL
-# 5.処理をひとまとまりにするための記述
+#5.処理をひとまとまりにするための記述
       db.execute("BEGIN TRANSACTION")
 
       CSV.open(zipfile, "r:Shift_JIS:UTF-8") do |csv|
         csv.each do |rec|
-# 6.ハッシュの作成
+#6.ハッシュの作成
 # ハッシュは、:code,:pref,:addr,alladdrをキーとして持つ。
 # 抽出したデータをINSERT分で登録する。
           data = Hash.new
